@@ -2,10 +2,12 @@ require('dotenv').config({ quiet: true });
 const express = require('express');
 const { sequelize } = require('./models');
 const authRoutes = require('./routes/authRoutes');
+const roomRoutes = require('./routes/roomRoutes');
 
 const app = express();
 app.use(express.json());
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/rooms', roomRoutes);
 
 const PORT = process.env.PORT || 5000;
 
