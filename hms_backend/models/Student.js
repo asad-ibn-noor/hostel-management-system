@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const Student = sequelize.define('Student', {
+const Student = sequelize.define("Student", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -21,32 +21,36 @@ const Student = sequelize.define('Student', {
     allowNull: false,
   },
   gender: {
-    type: DataTypes.ENUM('male', 'female', 'other'),
+    type: DataTypes.ENUM("male", "female", "other"),
     allowNull: false,
   },
   contact: {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
-  emergency_contact: {
-    type: DataTypes.STRING(255),
+  emergency_contact_name: {
+    type: DataTypes.STRING(150),
     allowNull: false,
   },
-  room_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
+  emergency_contact_phone: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
   },
   admission_date: {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM('active', 'checked_out'),
-    defaultValue: 'active',
+    type: DataTypes.ENUM("active", "checked_out"),
+    defaultValue: "active",
   },
 }, {
-  tableName: 'students',
-  timestamps: false, // SDD doesn't list created_at/updated_at for students
+  tableName: "students",
+  timestamps: true,
+  paranoid: true, // Enables soft deletes (deleted_at)
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+  deletedAt: "deleted_at",
 });
 
 module.exports = Student;

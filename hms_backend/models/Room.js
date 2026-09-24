@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const Room = sequelize.define('Room', {
+const Room = sequelize.define("Room", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -10,7 +10,6 @@ const Room = sequelize.define('Room', {
   room_number: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    unique: true,
   },
   block: {
     type: DataTypes.STRING(50),
@@ -20,29 +19,32 @@ const Room = sequelize.define('Room', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  room_type: {
+    type: DataTypes.ENUM("single", "double", "triple"),
+    allowNull: false,
+  },
   capacity: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  current_occupancy: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
-  room_type: {
-    type: DataTypes.ENUM('single', 'double', 'triple', 'quad'),
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.ENUM('available', 'full', 'maintenance'),
-    defaultValue: 'available',
-  },
-  monthly_fee: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
+  is_maintenance: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
 }, {
-  tableName: 'rooms',
-  timestamps: false,
+  tableName: "rooms",
+  timestamps: true,
+  paranoid: true, // Enables soft deletes (deleted_at)
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+  deletedAt: "deleted_at",
+  indexes: [
+    {
+      unique: true,
+      fields: ["block", "room_number"],
+      name: "unique_block_room"
+    }
+  ]
 });
 
 module.exports = Room;
