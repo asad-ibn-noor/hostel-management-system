@@ -4,8 +4,9 @@ const cors = require('cors'); // Required for React frontend
 const { sequelize } = require('./models');
 
 // Route imports (ensure these files actually exist before uncommenting)
-// const authRoutes = require('./routes/authRoutes');
-// const roomRoutes = require('./routes/roomRoutes');
+const authRoutes = require('./routes/authRoutes');
+const roomRoutes = require('./routes/roomRoutes');
+const  studentRoutes =  require('./routes/studentRoutes');
 
 const app = express();
 
@@ -15,8 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-// app.use('/api/v1/auth', authRoutes);
-// app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/v1/students', studentRoutes);
 
 const PORT = process.env.PORT || 5000;
 

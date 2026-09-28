@@ -41,7 +41,7 @@ const Student = sequelize.define("Student", {
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM("active", "checked_out"),
+    type: DataTypes.ENUM("pending", "active", "checked_out"),
     defaultValue: "active",
   },
 }, {
