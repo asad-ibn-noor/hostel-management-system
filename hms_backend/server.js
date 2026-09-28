@@ -6,7 +6,8 @@ const { sequelize } = require('./models');
 // Route imports (ensure these files actually exist before uncommenting)
 const authRoutes = require('./routes/authRoutes');
 const roomRoutes = require('./routes/roomRoutes');
-const  studentRoutes =  require('./routes/studentRoutes');
+const studentRoutes =  require('./routes/studentRoutes');
+const userRoutes = require('./routes/userRoutes')
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/rooms', roomRoutes);
 app.use('/api/v1/students', studentRoutes);
+app.use('/api/v1/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 
