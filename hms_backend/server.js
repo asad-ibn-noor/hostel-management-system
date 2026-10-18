@@ -9,6 +9,7 @@ const roomRoutes = require('./routes/roomRoutes');
 const studentRoutes =  require('./routes/studentRoutes');
 const userRoutes = require('./routes/userRoutes')
 const feeRoutes = require('./routes/feeRoutes');
+const invoiceRoutes = require('./routes/invoiceRoutes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/v1/rooms', roomRoutes);
 app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/fees', feeRoutes);
+app.use('/api/v1/invoices', invoiceRoutes);
 
 const PORT = process.env.PORT || 5000;
 
@@ -32,7 +34,7 @@ async function main() {
     console.log('✅ Database connected');
     
     // alter: true safely updates existing tables to match your new v1.2 models
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({});
     console.log('✅ Tables synced');
 
     const server = app.listen(PORT, () => {
