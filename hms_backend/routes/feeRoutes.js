@@ -9,8 +9,8 @@ router.use(verifyToken);
 
 // Fee Structure Routes (Admin only)
 router.post('/structures', requireRole('admin'), createFeeStructure);
-router.get('/structures', requireRole('admin', 'warden'), getFeeStructures);
-// Add the delete route here
 router.delete('/structures/:id', requireRole('admin'), deleteFeeStructure);
+// Fee Structure Routes (Admin & Warden)
+router.get('/structures', requireRole('admin', 'warden'), getFeeStructures);
 
 module.exports = router;

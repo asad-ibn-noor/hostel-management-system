@@ -3,6 +3,7 @@ const User = require("./User");
 const Student = require("./Student");
 const Room = require("./Room");
 const Allocation = require("./Allocation");
+const FeeStructure = require("./FeeStructure");
 
 // User <-> Student (1-to-1)
 User.hasOne(Student, { foreignKey: "user_id", onDelete: "CASCADE" });
@@ -21,5 +22,6 @@ module.exports = {
   User, 
   Student, 
   Room, 
-  Allocation 
+  Allocation,
+  FeeStructure
 };
