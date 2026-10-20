@@ -10,6 +10,8 @@ const studentRoutes =  require('./routes/studentRoutes');
 const userRoutes = require('./routes/userRoutes')
 const feeRoutes = require('./routes/feeRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+
 
 const app = express();
 
@@ -25,6 +27,7 @@ app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/fees', feeRoutes);
 app.use('/api/v1/invoices', invoiceRoutes);
+app.use('/api/v1/payments', paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 

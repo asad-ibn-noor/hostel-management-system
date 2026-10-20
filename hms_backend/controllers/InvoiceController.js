@@ -1,4 +1,4 @@
-// controllers/invoiceController.js
+// controllers/InvoiceController.js
 const { Invoice, Allocation, Room, FeeStructure, Student } = require('../models');
 const { Op } = require('sequelize');
 
@@ -81,4 +81,40 @@ async function generateInvoices(req, res) {
   }
 };
 
-module.exports = {generateInvoices}
+// GET /api/v1/invoices
+// GET /api/v1/invoices
+async function getInvoices(req, res) {
+  try {
+    const { student_id, status, billing_month } = req.query;
+    const whereClause = {};
+
+    // Ownership check: If logged in as a student, enforce their student_id
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ where: { user_id: req.user.id } });
+      if (!student) {
+        return res.status(404).json({ error: "Student record not found for this user account" });
+      }
+      whereClause.student_id = student.id;
+    } else if (student_id) {
+      // Admins and Wardens can filter by any passed student_id
+      whereClause.student_id = student_id;
+    }
+
+    if (status) whereClause.status = status;
+    if (billing_month) whereClause.billing_month = billing_month;
+
+    const invoices = await Invoice.findAll({
+      where: whereClause,
+      include: [
+        { model: Student, as: 'student' }
+      ],
+      order: [['billing_month', 'DESC']]
+    });
+
+    res.status(200).json(invoices);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch invoices", details: error.message });
+  }
+}
+
+module.exports = {generateInvoices, getInvoices}
