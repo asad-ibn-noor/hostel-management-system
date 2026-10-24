@@ -1,26 +1,118 @@
 const bcrypt = require('bcrypt');
-const { sequelize, User, Student } = require('../models');
+const { sequelize, User, Student, Staff } = require('../models');
 
-// Admin only — Creates Warden accounts (active immediately)
+// Admin only — Creates Warden account and linked Staff profile
 async function createWarden(req, res) {
+  const transaction = await sequelize.transaction();
+
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
+    const { email, password, employee_id_no, full_name, designation, contact } = req.body;
+
+    // 1. Validate required fields
+    if (!email || !password || !employee_id_no || !full_name) {
+      await transaction.rollback();
+      return res.status(400).json({
+        error: 'Email, password, employee_id_no, and full_name are required.'
+      });
     }
 
-    const existing = await User.findOne({ where: { email } });
-    if (existing) {
+    // 2. Check for existing email
+    const existingUser = await User.findOne({ where: { email }, transaction });
+    if (existingUser) {
+      await transaction.rollback();
       return res.status(409).json({ error: 'Email is already registered.' });
     }
 
-    const password_hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password_hash, role: 'warden', is_active: true });
+    // 3. Check for existing Employee ID
+    const existingStaff = await Staff.findOne({ where: { employee_id_no }, transaction });
+    if (existingStaff) {
+      await transaction.rollback();
+      return res.status(409).json({ error: 'Employee ID number is already registered.' });
+    }
 
-    return res.status(201).json({ message: 'Warden account created successfully.', userId: user.id });
+    // 4. Create User account
+    const password_hash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      email,
+      password_hash,
+      role: 'warden',
+      is_active: true
+    }, { transaction });
+
+    // 5. Create Staff profile record
+    const staff = await Staff.create({
+      user_id: user.id,
+      employee_id_no,
+      full_name,
+      designation: designation || 'Warden',
+      contact: contact || null,
+      status: 'active'
+    }, { transaction });
+
+    // Commit both operations
+    await transaction.commit();
+
+    return res.status(201).json({
+      message: 'Warden account and staff profile created successfully.',
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      },
+      staff: {
+        id: staff.id,
+        employee_id_no: staff.employee_id_no,
+        full_name: staff.full_name,
+        designation: staff.designation,
+        contact: staff.contact
+      }
+    });
+
   } catch (err) {
+    await transaction.rollback();
     console.error('Create Warden Error:', err);
-    return res.status(500).json({ error: 'Warden creation failed.' });
+    return res.status(500).json({ error: 'Warden creation failed.', details: err.message });
+  }
+}
+
+// Admin only — Deletes a Warden account and its associated Staff profile
+async function deleteWarden(req, res) {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const { id } = req.params; // Target Warden User ID
+
+    // 1. Fetch user within transaction
+    const user = await User.findByPk(id, { transaction });
+    if (!user) {
+      await transaction.rollback();
+      return res.status(404).json({ error: 'Warden user account not found.' });
+    }
+
+    // 2. Role Guard: Ensure we only delete warden accounts
+    if (user.role !== 'warden') {
+      await transaction.rollback();
+      return res.status(400).json({ 
+        error: 'Target account is not a warden. Cannot perform warden deletion on this user.' 
+      });
+    }
+
+    // 3. Delete user (CASCADE automatically deletes linked Staff row)
+    await user.destroy({ transaction });
+
+    await transaction.commit();
+
+    return res.status(200).json({
+      message: 'Warden account and associated staff profile deleted successfully.'
+    });
+
+  } catch (err) {
+    await transaction.rollback();
+    console.error('Delete Warden Error:', err);
+    return res.status(500).json({ 
+      error: 'Warden deletion failed.', 
+      details: err.message 
+    });
   }
 }
 
@@ -110,4 +202,5 @@ module.exports = {
   getPendingStudents,
   approveStudent,
   rejectStudent,
+  deleteWarden
 };

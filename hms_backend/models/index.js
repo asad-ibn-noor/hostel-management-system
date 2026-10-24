@@ -1,5 +1,6 @@
 const sequelize = require("../config/database");
 const User = require("./User");
+const Staff = require('./Staff');
 const Student = require("./Student");
 const Room = require("./Room");
 const Allocation = require("./Allocation");
@@ -7,6 +8,10 @@ const FeeStructure = require("./FeeStructure");
 const PaymentAllocation = require('./PaymentAllocation');
 const Invoice = require('./Invoice');
 const Payment = require('./Payment');
+
+// User <-> Staff (1-to-1)
+User.hasOne(Staff, { foreignKey: 'user_id', onDelete: "CASCADE" });
+Staff.belongsTo(User, { foreignKey: 'user_id' });
 
 // User <-> Student (1-to-1)
 User.hasOne(Student, { foreignKey: "user_id", onDelete: "CASCADE" });
@@ -57,5 +62,6 @@ module.exports = {
   FeeStructure,
   PaymentAllocation,
   Invoice,
-  Payment
+  Payment,
+  Staff
 };

@@ -6,13 +6,17 @@ const {
   getPendingStudents,
   approveStudent,
   rejectStudent,
+  deleteWarden,
 } = require('../controllers/UserController');
 
 // All routes here require authentication
 router.use(verifyToken);
 
 // Admin-only endpoint
-router.post('/wardens', requireRole('admin'), createWarden);
+router.post('/warden', requireRole('admin'), createWarden);
+
+// Delete Warden (Admin only)
+router.delete('/warden/:id', requireRole('admin'), deleteWarden);
 
 // Admin & Warden endpoints
 router.get('/pending', requireRole('admin', 'warden'), getPendingStudents);
