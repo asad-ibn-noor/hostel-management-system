@@ -11,6 +11,7 @@ const userRoutes = require('./routes/userRoutes')
 const feeRoutes = require('./routes/feeRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const visitorRoutes = require('./routes/visitorRoutes');
 
 
 const app = express();
@@ -28,6 +29,8 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/fees', feeRoutes);
 app.use('/api/v1/invoices', invoiceRoutes);
 app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/visitors', visitorRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 

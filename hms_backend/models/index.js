@@ -8,6 +8,7 @@ const FeeStructure = require("./FeeStructure");
 const PaymentAllocation = require('./PaymentAllocation');
 const Invoice = require('./Invoice');
 const Payment = require('./Payment');
+const VisitorLog = require('./VisitorLog')
 
 // User <-> Staff (1-to-1)
 User.hasOne(Staff, { foreignKey: 'user_id', onDelete: "CASCADE" });
@@ -53,6 +54,17 @@ PaymentAllocation.belongsTo(Payment, { foreignKey: 'payment_id', as: 'payment' }
 Payment.belongsToMany(Invoice, { through: PaymentAllocation, foreignKey: 'payment_id', otherKey: 'invoice_id', as: 'invoices' });
 Invoice.belongsToMany(Payment, { through: PaymentAllocation, foreignKey: 'invoice_id', otherKey: 'payment_id', as: 'payments' });
 
+// Student <-> VisitorLog
+Student.hasMany(VisitorLog, { foreignKey: 'visiting_student_id', as: 'visitorLogs', onDelete: 'CASCADE' });
+VisitorLog.belongsTo(Student, { foreignKey: 'visiting_student_id', as: 'visitingStudent' });
+
+// Staff <-> VisitorLog (Logged by / Checked out by)
+Staff.hasMany(VisitorLog, { foreignKey: 'logged_by', as: 'loggedVisitors' });
+VisitorLog.belongsTo(Staff, { foreignKey: 'logged_by', as: 'loggedByStaff' });
+
+Staff.hasMany(VisitorLog, { foreignKey: 'checkout_by', as: 'checkoutVisitors' });
+VisitorLog.belongsTo(Staff, { foreignKey: 'checkout_by', as: 'checkoutByStaff' });
+
 module.exports = { 
   sequelize, 
   User, 
@@ -63,5 +75,6 @@ module.exports = {
   PaymentAllocation,
   Invoice,
   Payment,
-  Staff
+  Staff,
+  VisitorLog
 };
